@@ -1,0 +1,79 @@
+#TO Cerate SQL Function We Can Use This Simple Syntax
+
+**************----------************************
+**************----------************************
+**************----------************************
+**************----------************************
+**************----------************************
+
+CREATE FUNCTION function_name
+(
+   @parameter_name datatype,
+   @parameter_name datatype,
+   ...
+)
+RETURNS return_datatype
+AS
+BEGIN
+   -- Declare variables
+   DECLARE @variable_name datatype;
+
+   -- Set variable values
+   SET @variable_name = value;
+
+   -- Add logic to your function using IF/ELSE statements, loops, etc.
+   IF condition THEN
+      -- code goes here
+   ELSE
+      -- code goes here
+   END IF;
+
+   -- Return the final result of your function
+   RETURN return_value;
+END
+
+
+**************----------************************
+**************----------************************
+**************----------************************
+**************----------************************
+**************----------************************
+
+
+#Example Code
+
+we can discuss about the function which function calculates the average rating of a product based on a table of customer reviews:
+
+//Create Function
+
+CREATE FUNCTION get_average_rating
+(
+   @product_id INT
+)
+RETURNS DECIMAL(5,2)
+AS
+BEGIN
+   DECLARE @rating DECIMAL(5,2);
+   SELECT @rating = AVG(rating)
+   FROM reviews
+   WHERE product_id = @product_id;
+   RETURN @rating;
+END
+
+
+user fuction in Store Procedure:
+
+
+CREATE PROCEDURE GetAvgRating
+AS
+--exec example_procedure
+BEGIN
+   -- Declare a variable to hold the result of the function
+   DECLARE @rating DECIMAL(5,2);
+
+   -- Set the value of the variable to the result of the function
+   SELECT @rating = dbo.get_average_rating(1);
+
+   -- Use the value of the variable in your stored procedure
+   SELECT * FROM products WHERE average_rating > @rating;
+END
