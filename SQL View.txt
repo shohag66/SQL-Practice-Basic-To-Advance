@@ -1,0 +1,102 @@
+To create a view in SQL, WE can use the following syntax
+
+
+CREATE VIEW view_name
+AS
+   SELECT column_name, column_name
+   FROM table_name
+   WHERE condition;
+
+###EXAMPLE:
+
+The SQL view that selects the names and email addresses of customers who have made a purchase in the last 30 days:
+
+
+CREATE VIEW active_customers
+AS
+   SELECT c.name, c.email
+   FROM customers c
+   INNER JOIN orders o ON c.customer_id = o.customer_id
+   WHERE o.order_date >= DATEADD(day, -30, GETDATE());
+
+
+SELECT * FROM active_customers;
+
+
+
+Create Complex Store procedure Using Joinning, View,(SQL Predifined) Funtion:
+
+
+## SQL query
+
+SELECT c.name, c.email, p.product_name, f.total_price
+FROM customers c
+INNER JOIN orders o ON c.customer_id = o.customer_id
+INNER JOIN order_items i ON o.order_id = i.order_id
+INNER JOIN products p ON i.product_id = p.product_id
+INNER JOIN (SELECT order_id, SUM(price * quantity) AS total_price FROM order_items GROUP BY order_id) f ON o.order_id = f.order_id
+WHERE c.name IN (SELECT name FROM active_customers) AND f.total_price > 100;
+
+## Sore Procedure
+CREATE PROCEDURE example_procedure
+AS
+EXEC example_procedure;
+BEGIN
+   -- Select the data you want to return
+
+   SELECT c.name, c.email, p.product_name, f.total_price
+   FROM customers c
+   INNER JOIN orders o ON c.customer_id = o.customer_id
+   INNER JOIN order_items i ON o.order_id = i.order_id
+   INNER JOIN products p ON i.product_id = p.product_id
+   INNER JOIN (SELECT order_id, SUM(price * quantity) AS total_price FROM order_items GROUP BY order_id) f ON o.order_id = f.order_id
+   WHERE c.name IN (SELECT name FROM active_customers) AND f.total_price > 100;
+END
+
+##Another Query
+
+CREATE PROCEDURE get_customer_orders(IN customer_id INT)
+BEGIN
+  SELECT o.order_id, o.order_total, v.customer_name
+  FROM orders o
+  INNER JOIN customers v ON o.customer_id = v.customer_id
+  WHERE v.customer_id = customer_id AND is_active(v.membership_expiration) = 1;
+END
+
+
+
+###Create Store Procedure Using View, User Defined Funtion and Joinning
+
+-- Definition of the is_active() function
+
+CREATE FUNCTION is_active(membership_expiration DATE)
+RETURNS TINYINT(1)
+BEGIN
+  DECLARE is_active TINYINT(1);
+  IF membership_expiration > CURDATE() THEN
+    SET is_active = 1;
+  ELSE
+    SET is_active = 0;
+  END IF;
+  RETURN is_active;
+END
+
+-- Definition of the customer_orders view
+
+CREATE VIEW customer_orders AS
+SELECT o.order_id, o.order_total, v.customer_name
+FROM orders o
+INNER JOIN customers v ON o.customer_id = v.customer_id
+
+
+-- Stored procedure to retrieve customer orders
+
+CREATE PROCEDURE get_customer_orders(IN customer_id INT)
+--exec get_customer_orders
+BEGIN
+  SELECT *
+  FROM customer_orders
+  WHERE customer_id = customer_id AND is_active(membership_expiration) = 1;
+END
+
+
